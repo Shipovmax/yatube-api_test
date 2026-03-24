@@ -23,18 +23,18 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework',          # Добавляем DRF
-    'rest_framework.authtoken', # Добавляем систему токенов
+    # Добавляем DRF и токены:
+    'rest_framework',
+    'rest_framework.authtoken',
+    # Наши приложения:
     'posts.apps.PostsConfig',
-    'api.apps.ApiConfig',      # Наше новое приложение
+    'api.apps.ApiConfig',
 ]
 
+# Настройка аутентификации DRF
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
-    ],
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
     ],
 }
 
