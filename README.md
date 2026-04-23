@@ -1,86 +1,91 @@
-# Проект API для Yatube (api_yatube)
+# Yatube API (v1)
 
-REST API для социальной сети Yatube. Проект позволяет взаимодействовать с приложением через API: получать списки постов и групп, публиковать новые записи, оставлять комментарии и управлять собственным контентом. 
+A REST API for the Yatube social blogging platform.  
+Supports posts, comments, and groups with Token-based authentication.
 
-Реализована аутентификация по токену (TokenAuthentication). Чтение данных доступно всем пользователям, а создание, изменение и удаление контента — только авторизованным авторам.
+---
 
-## Технологии
-* Python 3.9
-* Django 3.2
-* Django REST Framework (DRF)
-* SQLite3
+## Features
 
-## Как запустить проект:
+- **Posts** — full CRUD; image upload support; author auto-assigned from token
+- **Comments** — nested under posts; author-only edit/delete
+- **Groups** — read-only catalog
+- **Token authentication** — `TokenAuthentication` via `/api/v1/api-token-auth/`
+- **Permissions** — authenticated users can write; read-only for anonymous; only the author can modify their own content (`IsAuthorOrReadOnly`)
 
-1. Клонировать репозиторий и перейти в него в командной строке:
-```
-git clone [https://github.com/Ваш-Логин/api_yatube.git](https://github.com/Ваш-Логин/api_yatube.git)
-```
-```
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Language | Python 3.9 |
+| Framework | Django 3.2, DRF 3.12 |
+| Auth | DRF TokenAuthentication |
+| Database | SQLite3 |
+| Testing | pytest, pytest-django |
+
+---
+
+## Quick Start
+
+```bash
+git clone https://github.com/Shipovmax/api_yatube
 cd api_yatube
-```
-Cоздать и активировать виртуальное окружение:
 
-```
-python3 -m venv venv
-```
-```
-source venv/bin/activate
-```
-Установить зависимости из файла requirements.txt:
-
-```
-python -m pip install --upgrade pip
-```
-```
+python3 -m venv venv && source venv/bin/activate
 pip install -r requirements.txt
-```
 
-Выполнить миграции:
-
-```
 cd yatube_api
-```
-```
 python manage.py migrate
-```
-
-Запустить локальный сервер:
-
-```
 python manage.py runserver
 ```
-Примеры запросов к API
-Получение токена (POST):
-http://127.0.0.1:8000/api/v1/api-token-auth/
 
-```JSON
-{
-    "username": "test_user",
-    "password": "test_password"
-}
+API available at `http://127.0.0.1:8000/api/v1/`
+
+---
+
+## Authentication
+
+```http
+POST /api/v1/api-token-auth/
+Content-Type: application/json
+
+{"username": "user", "password": "password"}
 ```
-Получение списка всех постов (GET):
-http://127.0.0.1:8000/api/v1/posts/
 
-Создание нового поста (POST, требуется токен):
-http://127.0.0.1:8000/api/v1/posts/
-В заголовке запроса необходимо передать: Authorization: Token <ваш_токен>
+Use the returned token in subsequent requests:
 
-```JSON
-{
-    "text": "Мой первый пост через API!",
-    "group": 1
-}
+```http
+Authorization: Token <your_token>
 ```
-Получение списка групп (GET):
-http://127.0.0.1:8000/api/v1/groups/
 
-Добавление комментария к посту (POST, требуется токен):
-http://127.0.0.1:8000/api/v1/posts/{post_id}/comments/
+---
 
-```JSON
-{
-    "text": "Отличный пост!"
-}
+## API Endpoints
+
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| `GET` | `/api/v1/posts/` | List posts | No |
+| `POST` | `/api/v1/posts/` | Create post | Yes |
+| `GET/PUT/PATCH/DELETE` | `/api/v1/posts/{id}/` | Post detail | Author only for write |
+| `GET` | `/api/v1/groups/` | List groups | Yes |
+| `GET` | `/api/v1/groups/{id}/` | Group detail | Yes |
+| `GET/POST` | `/api/v1/posts/{id}/comments/` | List / create comments | Yes |
+| `GET/PUT/PATCH/DELETE` | `/api/v1/posts/{id}/comments/{id}/` | Comment detail | Author only for write |
+
+---
+
+## Running Tests
+
+```bash
+cd api_yatube  # project root
+pytest
 ```
+
+---
+
+## Author
+
+- GitHub: [Shipovmax](https://github.com/Shipovmax)
+- Email: shipov.max@icloud.com
